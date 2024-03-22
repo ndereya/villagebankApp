@@ -1,11 +1,10 @@
-
 <?php
 include('includes/header.php'); 
 include('includes/navbar.php'); 
-?><?php
+?>
+
+<?php
 include('includes/dbconfig.php');
-
-
 $deposit_count = 0;
 $withdrawal_count = 0;
 
@@ -32,71 +31,92 @@ if ($withdrawal_result) {
 $conn->close();
 ?>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="container card">
-<button onclick="printChart()">Print report</button>
-
-    <canvas id="transactionChart" width="50" height="50"></canvas>
-    
-     <div class="container card">
-   <?php
+<?php
 include('includes/dbconfig.php');
 
-$transactions_query = "SELECT * FROM transactions WHERE transaction_type = 'Deposit' OR transaction_type = 'Withdrawal' ORDER BY transaction_date DESC";
-$transactions_result = $conn->query($transactions_query);
+$job_query = "SELECT job, COUNT(*) AS count FROM users GROUP BY job";
+$job_result = $conn->query($job_query);
 
-if ($transactions_result->num_rows > 0) {
-    ?>
-    <table class="table">
-        <tr>
-            <td>#</td>
-            <td>Account Number</td>
-            <td>Amount</td>
-            <td>Date</td>
-            <td>Type</td>
-        </tr>
-    <?php
-    $count = 1;
-    while ($row = $transactions_result->fetch_assoc()) {
-        ?>
-        <tr>
-            <td><?php echo $count++; ?></td>
-            <td><?php echo $row["account_number"]; ?></td>
-            <td><?php echo $row["amount"]; ?></td>
-            <td><?php echo $row["transaction_date"]; ?></td>
-            <td><?php echo $row["transaction_type"]; ?></td>
-        </tr>
-        <?php
+$job_counts = [];
+
+if ($job_result) {
+    while ($row = $job_result->fetch_assoc()) {
+        $job_counts[$row['job']] = $row['count'];
     }
-    ?>
-    </table>
-    <?php
 } else {
-    echo "No transactions found.";
+    echo "Error fetching job counts: " . $conn->error;
 }
 
 $conn->close();
 ?>
-  <?php
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container card">
+    <div class="row">
+        <div class="col-md-6">
+            <canvas id="transactionChart" width="300" height="300"></canvas>
+            <button onclick="printChart()">Print Chart</button>
+        </div>
+        <div class="col-md-6">
+            <canvas id="jobChart" width="300" height="300"></canvas>
+        </div>
+    </div>
+
+    <?php
+    include('includes/dbconfig.php');
+
+    $transactions_query = "SELECT * FROM transactions WHERE transaction_type = 'Deposit' OR transaction_type = 'Withdrawal' ORDER BY transaction_date DESC";
+    $transactions_result = $conn->query($transactions_query);
+
+    if ($transactions_result->num_rows > 0) {
+        ?>
+        <table class="table">
+            <tr>
+                <td>#</td>
+                <td>Account Number</td>
+                <td>Amount</td>
+                <td>Date</td>
+                <td>Type</td>
+            </tr>
+            <?php
+            $count = 1;
+            while ($row = $transactions_result->fetch_assoc()) {
+                ?>
+                <tr>
+                    <td><?php echo $count++; ?></td>
+                    <td><?php echo $row["account_number"]; ?></td>
+                    <td><?php echo $row["amount"]; ?></td>
+                    <td><?php echo $row["transaction_date"]; ?></td>
+                    <td><?php echo $row["transaction_type"]; ?></td>
+                </tr>
+                <?php
+            }
+            ?>
+        </table>
+        <?php
+    } else {
+        echo "No transactions found.";
+    }
+
+    $conn->close();
+    ?>
+</div>
+
+<?php
 include('includes/scripts.php');
 include('includes/footer.php');
 ?>
-</div>
-</div>
-<script>
-    var depositCount = <?php echo $deposit_count; ?>;
-    var withdrawalCount = <?php echo $withdrawal_count; ?>;
 
-    // Create a pie chart
-    var ctx = document.getElementById('transactionChart').getContext('2d');
-    var myChart = new Chart(ctx, {
+<script>
+    var ctx1 = document.getElementById('transactionChart').getContext('2d');
+    var transactionChart = new Chart(ctx1, {
         type: 'pie',
         data: {
             labels: ['Deposits', 'Withdrawals'],
             datasets: [{
                 label: 'Transaction Type',
-                data: [depositCount, withdrawalCount],
+                data: [<?php echo $deposit_count; ?>, <?php echo $withdrawal_count; ?>],
                 backgroundColor: [
                     'rgba(54, 162, 235, 0.6)',
                     'rgba(255, 99, 132, 0.6)',
@@ -110,24 +130,46 @@ include('includes/footer.php');
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true, 
-            aspectRatio: 4, 
+            maintainAspectRatio: true,
+            aspectRatio: 1,
             legend: {
                 display: true,
-                position: 'bottom' 
+                position: 'bottom'
+            }
+        }
+    });
+
+    var ctx2 = document.getElementById('jobChart').getContext('2d');
+    var jobChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode(array_keys($job_counts)); ?>,
+            datasets: [{
+                label: 'Job Types',
+                data: <?php echo json_encode(array_values($job_counts)); ?>,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1,
+            legend: {
+                display: false
             },
-            layout: {
-                padding: {
-                    left: 10,
-                    right: 10,
-                    top: 10,
-                    bottom: 10
-                }
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
             }
         }
     });
 
     function printChart() {
-        window.print(); 
+        window.print();
     }
 </script>
