@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('dbconfig.php'); // Include your database configuration file
+include('dbconfig.php'); 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["accountnumber"];
@@ -19,10 +19,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
-        $_SESSION['user_account_number'] = $user['account_number']; // Store account number in session
-        $_SESSION['user_name'] = $user['full_name']; // Store name in session
-        $_SESSION['user_balance'] = $user['balance']; // Store balance in session
-        header("Location: dashboard.php"); // Redirect to dashboard
+        $_SESSION['user_account_number'] = $user['account_number']; 
+        $_SESSION['user_name'] = $user['full_name']; 
+        $_SESSION['user_balance'] = $user['balance']; 
+        header("Location: dashboard.php"); 
         exit();
     } else {
         echo "Invalid username or password";

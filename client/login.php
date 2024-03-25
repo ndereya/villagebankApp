@@ -5,9 +5,8 @@
   <title>Village Banking System</title>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    /* Custom styles */
     .navbar-custom {
-      background-color: #007bff !important; /* Blue navbar */
+      background-color: #007bff !important; 
     }
     .product-card {
       border: 1px solid #ddd;
