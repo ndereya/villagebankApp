@@ -7,7 +7,7 @@ include('includes/navbar.php');
 
   <!-- Page Heading -->
   <div class="d-sm-flex align-items-center justify-content-between mb-8">
-    <h3 class="h3 mb-0 text-gray-800 text-center">Withdraw details</h3>
+    <h3 class="h3 mb-0 text-gray-800 text-center">Deposit details</h3>
   
   </div>
 
@@ -23,11 +23,11 @@ include('includes/navbar.php');
                 <input type="text"name="account_number" placeholder="account number" class="form-control">
             </div>
             <div class="form-group">
-                <input type="number" name="deposit_amount" placeholder="amount to depositraw";
+                <input type="number" name="deposit_amount" placeholder="amount to deposit";
 class="form-control">
             </div>
             </div>
-            <button class="btn btn-success">Withdraw funds</button>
+            <button class="btn btn-success">Deposit funds</button>
         </div>
 </form>
      

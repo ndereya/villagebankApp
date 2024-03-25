@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $insert_charge_query = "INSERT INTO transactions (account_number, transaction_date, amount, transaction_type) VALUES ('$account_number', '$charge_date', '$charge_amount', '$charge_type')";
             $conn->query($insert_charge_query);
 
-            echo "Withdrawal successful. New balance: $new_balance";
+            header("Location:index.php");
         } else {
             echo "Insufficient funds.";
         }

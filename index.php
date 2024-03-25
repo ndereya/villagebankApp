@@ -164,7 +164,7 @@ $conn->close();
 include('includes/dbconfig.php');
 
 // Fetch transactions from the database
-$transactions_query = "SELECT * FROM transactions WHERE transaction_type = 'Deposit' OR transaction_type = 'Withdrawal' ORDER BY transaction_date DESC";
+$transactions_query = "SELECT * FROM transactions WHERE transaction_type = 'Deposit' OR transaction_type = 'Withdrawal'";
 $transactions_result = $conn->query($transactions_query);
 
 // Check if there are transactions
