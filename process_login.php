@@ -1,41 +1,37 @@
 <?php
 session_start();
+include('includes/dbconfig.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+// Check if the form is submitted
+if($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Check if both username and password are provided
+    if(isset($_POST['username']) && isset($_POST['password'])) {
+        $username = $conn->real_escape_string($_POST['username']);
+        $password = $conn->real_escape_string($_POST['password']);
 
-    $host = "localhost";
-    $usernameDB = "root";
-    $passwordDB = "";
-    $dbname = "bunjsacco";
+        // Prepare and execute the query
+        $query = "SELECT * FROM admins WHERE username=? AND password=?";
+        $stmt = $conn->prepare($query);
 
-    $conn = new mysqli($host, $usernameDB, $passwordDB, $dbname);
+        if (!$stmt) {
+            die("Error in prepare statement: " . $conn->error);
+        }
 
-    // Check the 
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        $stmt->bind_param("ss", $username, $password);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // Check if login is successful
+        if ($result->num_rows == 1) {
+            $user = $result->fetch_assoc();
+            $_SESSION['user_name'] = $user['username']; 
+            header("Location: index.php"); 
+            exit();
+        } else {
+            $login_error = "Invalid username or password";
+        }
     }
-
-    $stmt = $conn->prepare("SELECT password FROM admins WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->bind_result($hashedPassword);
-    $stmt->fetch();
-
-    if (password_verify($password, $hashedPassword)) {
-        $_SESSION['admin_logged_in'] = true;
-
-        header("Location: dashboard.php");
-        exit();
-    } else {
-        echo "Invalid username or password. Please try again.";
-    }
-
-    $stmt->close();
-    $conn->close();
-} else {
-    header("Location: login.php");
-    exit();
+}else{
+    echo "not set";
 }
 ?>
