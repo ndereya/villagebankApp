@@ -12,3 +12,5 @@ add customers and their location coordinates are saved automatically if they all
 generate reports on savings etc
 
 view clients on the map for customized products 
+
+#How to install
